@@ -1,4 +1,5 @@
 import itertools
+import json
 
 class Player:
     def __init__(self, name):
@@ -9,6 +10,8 @@ class Player:
             "large_straight": None, "yahtzee": None, "chance": None
         }
         self.total_score = 0
+        with open('lookup_tables/ev_lookup_table.json', 'r') as f:
+            self.ev_lookup_table = json.load(f)
 
     def decide_keep_or_end(self, dice):
         print(f"Dice: {dice}")
@@ -65,33 +68,6 @@ class Player:
             return 0
     
     def calculate_ev(self, dice, category):
-        # Shortcuts for certain categories to avoid full enumeration
-        if len(dice) < 5:
-            # Ones through Sixes have predictable EV
-            if category in ["ones", "twos", "threes", "fours", "fives", "sixes"]:
-                num = {"ones": 1, "twos": 2, "threes": 3, "fours": 4, "fives": 5, "sixes": 6}[category]
-                missing_dice = 5 - len(dice)
-                current_count = dice.count(num)
-                return ((current_count + (missing_dice * (1/6))) * num)
-
-         # Chance has a simple linear expectation
-            if category == "chance":
-                missing_dice = 5 - len(dice)
-                return sum(dice) + (missing_dice * 3.5)
-
-            # For more complex categories, use full enumeration
-            total_ev = 0
-            missing_dice = 5 - len(dice)
-            for roll_combination in itertools.product(range(1, 7), repeat=missing_dice):
-                full_dice = list(dice) + list(roll_combination)
-                score = self.calculate_score(full_dice, category)
-                prob = 1 / (6 ** missing_dice)
-                total_ev += score * prob
-        
-            return total_ev
-
-        # If 5 dice, simply return the score
-        return self.calculate_score(dice, category)
-    
-    
-
+        dice_tuple = tuple(sorted(dice))
+        dice_key = str(dice_tuple)
+        return self.ev_lookup_table[dice_key][category]

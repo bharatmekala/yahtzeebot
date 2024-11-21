@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from game import Game
 from RandomBots import RandomBot1, RandomBot2
-from GreedyBots import RandomGreedyBot, EVGreedyBot
+from GreedyBots import RandomGreedyBot, EVGreedyBot, MAXGreedyBot, EpsilonGreedyBot, TaperingBot
 import numpy as np
 import os
 from tqdm import tqdm
@@ -59,4 +59,4 @@ def test_bot(bot_class, num_games=10000, output_dir="output"):
     plt.close()
 
 # Example usage
-test_bot(EVGreedyBot)
+test_bot(TaperingBot)
